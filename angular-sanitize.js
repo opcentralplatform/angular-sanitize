@@ -2,7 +2,9 @@
  * @license AngularJS v1.5.8
  * (c) 2010-2016 Google, Inc. http://angularjs.org
  * License: MIT
- * Security patch: Fixed CVE-2025-4690 ReDoS vulnerability in linky filter
+ * Security patches: 
+ *   - Fixed CVE-2025-4690 ReDoS vulnerability in linky filter
+ *   - Fixed CVE-2025-2336 SVG image href sanitization bypass
  */
 (function(window, angular) {'use strict';
 
@@ -462,7 +464,8 @@ function $SanitizeProvider() {
           out(tag);
           forEach(attrs, function(value, key) {
             var lkey = lowercase(key);
-            var isImage = (tag === 'img' && lkey === 'src') || (lkey === 'background');
+            var isImage = (tag === 'img' && lkey === 'src') || (lkey === 'background') ||
+                          (tag === 'image' && (lkey === 'href' || lkey === 'xlink:href'));
             if (validAttrs[lkey] === true &&
               (uriAttrs[lkey] !== true || uriValidator(value, isImage))) {
               out(' ');

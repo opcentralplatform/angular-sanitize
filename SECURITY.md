@@ -2,6 +2,45 @@
 
 ## Fixed Vulnerabilities
 
+### CVE-2025-2336 - SVG Image Href Sanitization Bypass (Fixed in v1.5.8)
+
+**Severity**: Medium
+
+**Description**: 
+Improper sanitization of `href` and `xlink:href` attributes in SVG `<image>` elements allowed attackers to bypass image source restrictions. This could lead to content spoofing and negatively impact application performance by loading large or slow-to-load images.
+
+**Affected Versions**: 
+AngularJS 1.3.1 and later (all versions prior to this patch)
+
+**Fixed Version**: 
+1.5.8 (patched)
+
+**Fix Details**:
+The vulnerability existed because the sanitization code only treated HTML `<img>` elements with `src` attributes as images, but did not properly handle SVG `<image>` elements with `href` or `xlink:href` attributes.
+
+**Before (Vulnerable):**
+```javascript
+var isImage = (tag === 'img' && lkey === 'src') || (lkey === 'background');
+```
+
+**After (Secure):**
+```javascript
+var isImage = (tag === 'img' && lkey === 'src') || (lkey === 'background') ||
+              (tag === 'image' && (lkey === 'href' || lkey === 'xlink:href'));
+```
+
+The fix ensures that SVG `<image>` elements with `href` or `xlink:href` attributes are properly identified as image sources and subject to the same URI validation as HTML images, preventing bypass of image source restrictions.
+
+**Impact:**
+- Content spoofing attacks through malicious SVG images
+- Performance degradation from loading large or slow images
+- Bypass of Content Security Policy restrictions on image sources
+
+**Mitigation**:
+Upgrade to version 1.5.8 or later with this patch applied. If upgrading is not immediately possible, disable SVG support or implement strict Content Security Policy (CSP) headers.
+
+---
+
 ### CVE-2025-4690 - ReDoS in linky filter (Fixed in v1.5.8)
 
 **Severity**: Medium
